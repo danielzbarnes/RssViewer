@@ -20,7 +20,7 @@ class RssFeedFetcher {
             var rssList: List<RssItem> = emptyList()
             try {
 
-                // this method of network call is functional but needs to be updated for Java 8
+                // this method of network call is functional but needs to be updated for Android 8
                 val url = URL(RSS)
                 val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
 
