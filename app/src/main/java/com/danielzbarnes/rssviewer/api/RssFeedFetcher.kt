@@ -15,12 +15,17 @@ class RssFeedFetcher {
 
     private val rssFeedParser = RssFeedParser()
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    // This way of accessing the url generates an "Inappropriate blocking method call" Warning
+    // because Android Studio registers the main thread is being blocked
+    // however, this is incorrect because network call is being wrapped inside withContext(Dispatchers.IO)
+    // the lint warning seems to be some issue with Android Studio
+
     suspend fun fetchRss(): List<RssItem> =
         withContext(Dispatchers.IO) {
             var rssList: List<RssItem> = emptyList()
             try {
 
-                // this method of network call is functional but needs to be updated for Android 8
                 val url = URL(RSS)
                 val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
 
