@@ -12,6 +12,9 @@ import java.net.URL
 // Android 9(API 28) and above devices by default only allow secure connections using HTTPS, TLS, etc
 // to enable connection using unencrypted HTTP protocol on Android 9+ devices
 // network_security_config.xml needs to be defined with cleartextTrafficPermitted = "true"
+
+// The app needs to then be told to use the defined network_security_config in the AndroidManifest.xml
+// android:networkSecurityConfig="@xml/your_network_security_config" in the <application> tag
 private const val RSS = "http://<YOUR RSS FEED HERE>.xml"
 
 class RssFeedFetcher {
