@@ -1,8 +1,11 @@
 package com.danielzbarnes.rssviewer.api
 
+import android.util.Log
 import com.danielzbarnes.rssviewer.RssItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.*
+import java.io.IOException
 import java.io.InputStream
 import java.lang.Exception
 import java.net.HttpURLConnection
@@ -20,16 +23,16 @@ private const val RSS = "http://<YOUR RSS FEED HERE>.xml"
 class RssFeedFetcher {
 
     private val rssFeedParser = RssFeedParser()
+    private var rssList: List<RssItem> = emptyList()
 
     @Suppress("BlockingMethodInNonBlockingContext")
     // This way of accessing the url generates an "Inappropriate blocking method call" Warning
     // because Android Studio registers the main thread is being blocked
     // however, this is incorrect because network call is being wrapped inside withContext(Dispatchers.IO)
     // the lint warning seems to be some issue with Android Studio
-
     suspend fun fetchRss(): List<RssItem> =
         withContext(Dispatchers.IO) {
-            var rssList: List<RssItem> = emptyList()
+
             try {
 
                 val url = URL(RSS)
@@ -53,4 +56,28 @@ class RssFeedFetcher {
             }
             return@withContext rssList
         }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun fetchWithOkhttp(): List<RssItem> = withContext(Dispatchers.IO) {
+
+        val client = OkHttpClient().newBuilder().build()
+
+        val request = Request.Builder().url(RSS).build()
+
+        try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                Log.d(TAG, "client.newCall()")
+
+                rssList = rssFeedParser.parseRss(response.body()!!.byteStream())
+
+                response.close()
+            }
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+
+        return@withContext rssList
+    }
 }
