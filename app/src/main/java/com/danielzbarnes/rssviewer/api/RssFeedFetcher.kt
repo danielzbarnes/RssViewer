@@ -60,6 +60,7 @@ class RssFeedFetcher {
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun fetchWithOkhttp(): List<RssItem> = withContext(Dispatchers.IO) {
 
+        // okhttp3 implementation method
         val client = OkHttpClient().newBuilder().build()
 
         val request = Request.Builder().url(RSS).build()
